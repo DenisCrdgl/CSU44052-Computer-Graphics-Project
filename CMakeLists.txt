@@ -8,7 +8,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # GLAD
 add_subdirectory(external/glad/cmake)
-glad_add_library(glad_gl_core_33 STATIC REPRODUCIBLE API gl:core=3.3) # OpenGL 3.3
+glad_add_library(glad_gl_core_33 STATIC REPRODUCIBLE API gl:core=3.3 EXTENSIONS NONE) # OpenGL 3.3
 
 # GLFW
 set(GLFW_INSTALL OFF CACHE BOOL "" FORCE) # unnecessary in the project context
