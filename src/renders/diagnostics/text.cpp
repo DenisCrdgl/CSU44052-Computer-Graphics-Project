@@ -116,8 +116,8 @@ void RenderText::drawTxt(
         return;
     }
 
-    shader.uniSet("uViewportSize", glm::vec2(static_cast<float>(viewportWidth), static_cast<float>(viewportHeight)));
-    shader.uniSet("uColor", color);
+    shader.uniSet("viewportSize", glm::vec2(static_cast<float>(viewportWidth), static_cast<float>(viewportHeight)));
+    shader.uniSet("color", color);
 
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);

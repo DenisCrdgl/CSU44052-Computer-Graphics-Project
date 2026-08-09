@@ -9,8 +9,11 @@
 
 #include "scene/user/camera/camera.h"
 #include "scene/landscape/sky/sky.h"
+#include "scene/landscape/clouds/seaOfClouds.h"
 
 #include <cstdio>
+#include <cmath>
+#include <vector>
 
 namespace {
     int viewportWidth = 1280;
@@ -91,6 +94,8 @@ int main(){
         return 1;
     }
 
+    glEnable(GL_PROGRAM_POINT_SIZE);
+
     Sky sky;
     const glm::vec3 sunColor(1.0f, 0.96f, 0.88f);
     const glm::vec3 sunDirection = glm::normalize(glm::vec3(-0.45f, 0.65f, -0.35f));
@@ -99,7 +104,22 @@ int main(){
     Shader skyShader("shaders/sky/sky.frag", "shaders/sky/sky.vert");
 
     RenderText hud;
-    Shader textShader("shaders/runtimeDiagnostics/frameRate.frag", "shaders/runtimeDiagnostics/frameRate.vert");
+    Shader textShader("shaders/runtimeDiagnostics/runtimeDiagnostics.frag", "shaders/runtimeDiagnostics/runtimeDiagnostics.vert");
+
+    CloudSeaParams cloudParams;
+    const int cloudChunkRadius = 8;
+    const glm::vec3 cloudColor(0.9f, 0.9f, 0.95f);
+    Shader cloudsShader("shaders/clouds/clouds.frag", "shaders/clouds/clouds.vert");
+
+    uint32_t cloudVao = 0;
+    uint32_t cloudVbo = 0;
+    glGenVertexArrays(1, &cloudVao);
+    glGenBuffers(1, &cloudVbo);
+    glBindVertexArray(cloudVao);
+    glBindBuffer(GL_ARRAY_BUFFER, cloudVbo);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glBindVertexArray(0);
 
     int fpsTotalFrames = 0;
 
@@ -137,6 +157,21 @@ int main(){
         );
         glm::mat4 viewProjectionInverted = glm::inverse(projection * view);
 
+        glm::vec3 camPos = camera.position();
+        int midChunkX = static_cast<int>(std::floor(camPos.x / cloudParams.chunkSize));
+        int midChunkZ = static_cast<int>(std::floor(camPos.z / cloudParams.chunkSize));
+
+        std::vector<float> cloudSpawnPoints;
+        glm::vec3 spawnCoords;
+        for(int i = midChunkZ - cloudChunkRadius; i <= midChunkZ + cloudChunkRadius; i++){
+            for(int j = midChunkX - cloudChunkRadius; j <= midChunkX + cloudChunkRadius; j++){
+                if(cloudChunk(spawnCoords, cloudParams, j, i)){
+                    cloudSpawnPoints.push_back(spawnCoords.x);
+                    cloudSpawnPoints.push_back(spawnCoords.y);
+                    cloudSpawnPoints.push_back(spawnCoords.z);
+                }
+            }
+        }
 
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -146,8 +181,25 @@ int main(){
         skyShader.uniSet("lowerSkyColor", lowerSkyColor);
         skyShader.uniSet("upperSkyColor", upperSkyColor);
         skyShader.uniSet("viewProjectionInverted", viewProjectionInverted);
-        skyShader.uniSet("cameraPosition", camera.position());
+        skyShader.uniSet("cameraPosition", camPos);
         sky.drawSky();
+
+        if(!cloudSpawnPoints.empty()){
+            cloudsShader.use();
+            cloudsShader.uniSet("viewProjection", projection * view);
+            cloudsShader.uniSet("color", cloudColor);
+
+            glBindVertexArray(cloudVao);
+            glBindBuffer(GL_ARRAY_BUFFER, cloudVbo);
+            glBufferData(
+                GL_ARRAY_BUFFER, 
+                static_cast<GLsizeiptr>(cloudSpawnPoints.size() * sizeof(float)), 
+                cloudSpawnPoints.data(), 
+                GL_DYNAMIC_DRAW
+            );
+            glDrawArrays(GL_POINTS, 0, static_cast<GLsizei>(cloudSpawnPoints.size() / 3));
+            glBindVertexArray(0);
+        }
 
         textShader.use();
 
@@ -176,7 +228,6 @@ int main(){
         );
 
         char coordBuff[64];
-        glm::vec3 camPos = camera.position();
         std::snprintf(
             coordBuff, 
             sizeof(coordBuff), 
