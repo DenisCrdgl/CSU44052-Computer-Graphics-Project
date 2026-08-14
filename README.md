@@ -8,7 +8,7 @@ If this repo was freshly cloned, run:
 git submodule update --init --recursive
 
 ### Windows
-mkdir -p build
+mkdir build
 cd build
 cmake .. -G "MinGW Makefiles"
 cmake --build .

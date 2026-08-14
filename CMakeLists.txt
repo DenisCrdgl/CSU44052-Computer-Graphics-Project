@@ -21,6 +21,10 @@ add_subdirectory(external/glfw)
 # GLM
 add_subdirectory(external/glm)
 
+# Concurrency
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
 # EXE
 file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/*.cpp)
 add_executable(project ${PROJECT_SOURCES})
@@ -29,6 +33,7 @@ target_link_libraries( project PRIVATE
     glad_gl_core_33
     glfw 
     glm::glm
+    Threads::Threads
 )
 
 target_include_directories( project PRIVATE ${CMAKE_SOURCE_DIR}/src)

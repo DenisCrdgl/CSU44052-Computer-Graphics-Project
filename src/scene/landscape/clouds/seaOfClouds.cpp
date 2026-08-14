@@ -37,11 +37,33 @@ bool cloudChunk(glm::vec3& position, const CloudSeaParams& params, int xRate, in
     std::mt19937 rng(chunkSeed);
     std::uniform_real_distribution<float> jitter(-1.0f, 1.0f);
 
-    // for later
     position = glm::vec3(
         chunkX + jitter(rng) * params.chunkSize * 0.35f,
         glm::mix(params.minThresh, params.maxThresh, seaHeight),
         chunkZ + jitter(rng) * params.chunkSize * 0.35f);
+
+    return true;
+}
+
+bool assembleCloudParams(CloudParams& result, const CloudSeaParams& params, int xRate, int zRate){
+    glm::vec3 position;
+
+    if(!cloudChunk(position, params, xRate, zRate)){
+        return false;
+    }
+
+    uint32_t seed = hashedChunk(xRate, zRate, params.seed);
+    std::mt19937 rng(seed);
+    std::uniform_real_distribution<float> randFloat(0.0f, 1.0f);
+
+    result.position = position;
+    result.seed = seed;
+    result.cloudFrequency = 0.5f + randFloat(rng) * 0.25f;
+    result.cloudSpread = 2.5f + randFloat(rng) * 3.0f;
+    result.cloudAmplitude = result.cloudSpread * 0.35f;
+    result.cloudHeight = 0.25f + randFloat(rng) * 0.15f;
+    result.cloudFluff = 4 + static_cast<int>(randFloat(rng) * 3.0f);
+    result.cloudFragments = 10;
 
     return true;
 }
