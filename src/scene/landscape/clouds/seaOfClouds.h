@@ -16,13 +16,13 @@ struct CloudSeaParams {
 bool cloudChunk(
     glm::vec3& position,
     const CloudSeaParams& params,
-    int xRate,
-    int zRate
+    int x,
+    int z
 );
 
 bool assembleCloudParams(
     CloudParams& result,
     const CloudSeaParams& params,
-    int xRate,
-    int zRate
+    int x,
+    int z
 );

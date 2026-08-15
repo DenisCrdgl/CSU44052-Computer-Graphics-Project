@@ -11,6 +11,7 @@
 #include "scene/landscape/sky/sky.h"
 #include "scene/landscape/clouds/seaOfClouds.h"
 #include "scene/landscape/clouds/cloudLandscape.h"
+#include "scene/landscape/props/props.h"
 #include "renders/frustum/frustum.h"
 
 #include <cstdio>
@@ -113,6 +114,67 @@ int main(){
     Shader cloudsShader("shaders/clouds/clouds.frag", "shaders/clouds/clouds.vert");
     CloudLandscape cloudLandscape(cloudParams);
 
+    Shader propShader("shaders/props/props.frag", "shaders/props/props.vert");
+
+    Prop lighthouseIsland(
+        PropParams{
+            55.0f, 90.0f,
+            0.9f, 1.4f,
+            1, 1,
+            0.0f, 3,
+            190.0f,
+            0.55f,
+            7777
+        },
+        "assets/low_poly_lighthouse_island/scene.gltf"
+    );
+
+    Prop balloons(
+        PropParams{
+            22.0f, 46.0f, 
+            3.0f, 4.5f,
+            2, 4,
+            18.0f, 5,
+            170.0f, 
+            0.55f,
+            6666
+        },
+        "assets/low_poly_air_baloon/scene.gltf"
+    );
+
+    Prop toriiIsland(
+        PropParams{
+            18.0f, 44.0f,
+            0.5f, 0.85f,
+            1, 1,
+            0.0f, 3,
+            150.0f,
+            0.6f,
+            5555
+        },
+        "assets/low_poly_torii_island/scene.gltf"
+    );
+
+    Prop treeIsland(
+        PropParams{
+            15.0f, 40.0f,
+            5.0f, 8.0f,
+            1, 1,
+            0.0f, 5,
+            100.0f,
+            0.6f,
+            4444
+        },
+        "assets/low_poly_tree_island/scene.gltf"
+    );
+
+    for(Prop* prop : {&lighthouseIsland, &balloons, &toriiIsland, &treeIsland}){
+        if(!prop->load()){
+            std::fprintf(stderr, "Could not load props\n");
+            return 1;
+        }
+    }
+
     int fpsTotalFrames = 0;
 
     float fpsTotalTime = 0.0f;
@@ -152,6 +214,9 @@ int main(){
         Frustum frustum(projection * view);
 
         cloudLandscape.updateLandscape(camPos);
+        for(Prop* prop : {&lighthouseIsland, &balloons, &toriiIsland, &treeIsland}){
+            prop->update(camPos);
+        }
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -168,6 +233,14 @@ int main(){
         cloudsShader.uniSet("viewProjection", projection * view);
         cloudsShader.uniSet("color", cloudColor);
         cloudLandscape.drawLandscape(frustum);
+
+        propShader.use();
+        propShader.uniSet("viewProjection", projection * view);
+        lighthouseIsland.drawProp(propShader);
+        balloons.drawProp(propShader);
+        toriiIsland.drawProp(propShader);
+        treeIsland.drawProp(propShader);
+
 
         glDisable(GL_DEPTH_TEST);
         textShader.use();

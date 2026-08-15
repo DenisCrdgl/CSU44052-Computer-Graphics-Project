@@ -36,4 +36,12 @@ target_link_libraries( project PRIVATE
     Threads::Threads
 )
 
-target_include_directories( project PRIVATE ${CMAKE_SOURCE_DIR}/src)
+target_include_directories( project PRIVATE 
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/external/tinygltf    
+)
+
+target_compile_definitions( project PRIVATE
+    TINYGLTF_NO_STB_IMAGE
+    TINYGLTF_NO_STB_IMAGE_WRITE
+)

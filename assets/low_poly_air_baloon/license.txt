@@ -1,0 +1,11 @@
+Model Information:
+* title:	Hot Air Baloon
+* source:	https://sketchfab.com/3d-models/hot-air-baloon-a4e998f37f4947f4b217e630a351ee9d
+* author:	hercules2209 (https://sketchfab.com/hercules2209)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Hot Air Baloon" (https://sketchfab.com/3d-models/hot-air-baloon-a4e998f37f4947f4b217e630a351ee9d) by hercules2209 (https://sketchfab.com/hercules2209) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
