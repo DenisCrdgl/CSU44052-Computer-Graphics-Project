@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "config.h"
+
 #include "scene/user/camera/camera.h"
 #include "scene/landscape/sky/sky.h"
 #include "scene/landscape/clouds/seaOfClouds.h"
@@ -19,10 +21,11 @@
 
 
 namespace {
-    int viewportWidth = 1280;
-    int viewportHeight = 720;
+    int viewportWidth = Config::windowWidth;
+    int viewportHeight = Config::windowHeight;
 
     bool startingMousePos = true;
+    bool wireframeDisplay = false;
 
     float mouseX = viewportWidth / 2.0f;
     float mouseY = viewportHeight / 2.0f;
@@ -30,8 +33,8 @@ namespace {
     Camera camera(glm::vec3(0.0f, 24.0f, 75.0f));
     Wyvern wyvern(glm::vec3(0.0f, 24.0f, 75.0f));
 
-    const float camHeight = 10.0f;
-    const float camDist = 20.0f;
+    const float camHeight = Config::cameraHeight;
+    const float camDist = Config::cameraDistance;
 
     const float lightSourceDist = 40.0f;
     const float shadowFarPlane = lightSourceDist + 80.0f;
@@ -44,6 +47,10 @@ namespace {
 
         if(key == GLFW_KEY_ESCAPE){
             glfwSetWindowShouldClose(window, GLFW_TRUE);
+        }
+
+        if(key == GLFW_KEY_TAB){
+            wireframeDisplay = !wireframeDisplay;
         }
     }
 
@@ -119,6 +126,8 @@ int main(){
     Shader textShader("shaders/runtimeDiagnostics/runtimeDiagnostics.frag", "shaders/runtimeDiagnostics/runtimeDiagnostics.vert");
 
     CloudSeaParams cloudParams;
+    cloudParams.chunkSize = Config::cloudChunkSize;
+    cloudParams.spawnRate = Config::cloudSpawnRate;
     const glm::vec3 cloudColor(0.9f, 0.9f, 0.95f);
     Shader cloudsShader("shaders/clouds/clouds.frag", "shaders/clouds/clouds.vert");
     CloudLandscape cloudLandscape(cloudParams);
@@ -131,8 +140,8 @@ int main(){
             0.9f, 1.4f,
             1, 1,
             0.0f, 3,
-            190.0f,
-            0.55f,
+            Config::lighthouseChunkSize,
+            Config::lighthouseSpawnRate,
             7777
         },
         "assets/low_poly_lighthouse_island/scene.gltf"
@@ -144,8 +153,8 @@ int main(){
             3.0f, 4.5f,
             2, 4,
             18.0f, 5,
-            170.0f, 
-            0.55f,
+            Config::balloonChunkSize,
+            Config::balloonSpawnRate,
             6666
         },
         "assets/low_poly_air_baloon/scene.gltf"
@@ -157,8 +166,8 @@ int main(){
             0.5f, 0.85f,
             1, 1,
             0.0f, 3,
-            150.0f,
-            0.6f,
+            Config::toriiChunkSize,
+            Config::toriiSpawnRate,
             5555
         },
         "assets/low_poly_torii_island/scene.gltf"
@@ -170,8 +179,8 @@ int main(){
             5.0f, 8.0f,
             1, 1,
             0.0f, 5,
-            100.0f,
-            0.6f,
+            Config::treeChunkSize,
+            Config::treeSpawnRate,
             4444
         },
         "assets/low_poly_tree_island/scene.gltf"
@@ -191,7 +200,7 @@ int main(){
     }
     const glm::vec3 wyvernColor(0.55f, 0.32f, 0.30f);
 
-    Shadow shadow(1024);
+    Shadow shadow(Config::shadowResolution);
     Shader shadowShader("shaders/shadow/shadow.frag", "shaders/shadow/shadow.vert");
 
     int fpsTotalFrames = 0;
@@ -230,9 +239,9 @@ int main(){
 
         glm::mat4 view = camera.viewMatrix();
         glm::mat4 projection = glm::perspective(
-            glm::radians(65.0f),
+            glm::radians(Config::cameraFov),
             static_cast<float>(viewportWidth) / static_cast<float>(viewportHeight),
-            0.1f, 1000.0f
+            Config::cameraNearPlane, Config::cameraFarPlane
         );
         glm::mat4 viewProjectionInverted = glm::inverse(projection * view);
         glm::vec3 camPos = camera.position();
@@ -260,6 +269,8 @@ int main(){
             1.0f,
             shadowFarPlane
         );
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         
         shadow.start();
         shadowShader.use();
@@ -268,6 +279,13 @@ int main(){
         shadow.stop(viewportWidth, viewportHeight);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        if(wireframeDisplay){
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+        else{
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
 
         skyShader.use();
         skyShader.uniSet("sunColor", sunColor);
@@ -306,6 +324,7 @@ int main(){
         wyvernShader.uniSet("sunDirection", sunDirection);
         wyvern.drawWyvern(wyvernShader, wyvernColor);
 
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         glDisable(GL_DEPTH_TEST);
         textShader.use();
 
