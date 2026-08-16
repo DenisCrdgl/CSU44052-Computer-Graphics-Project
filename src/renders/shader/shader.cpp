@@ -95,3 +95,12 @@ void Shader::uniSet(const std::string& loc, const glm::vec3& val) const{
 void Shader::uniSet(const std::string& loc, const glm::mat4& val) const{
     glUniformMatrix4fv(uniLocation(loc), 1, GL_FALSE, glm::value_ptr(val));
 }
+
+void Shader::uniSet(const std::string& loc, const std::vector<glm::mat4>& vals) const{
+    glUniformMatrix4fv(
+        uniLocation(loc), 
+        static_cast<GLsizei>(vals.size()), 
+        GL_FALSE,
+        glm::value_ptr(vals[0])
+    );
+}

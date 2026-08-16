@@ -1,0 +1,11 @@
+Model Information:
+* title:	DG V_3
+* source:	https://sketchfab.com/3d-models/dg-v-3-edfa29081d7d475083649ab3c16b2190
+* author:	mgsawwinhtike3002 (https://sketchfab.com/SawWinHtike)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "DG V_3" (https://sketchfab.com/3d-models/dg-v-3-edfa29081d7d475083649ab3c16b2190) by mgsawwinhtike3002 (https://sketchfab.com/SawWinHtike) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

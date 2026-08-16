@@ -1,19 +1,16 @@
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
-#include "renders/shader/shader.h"
-#include "renders/diagnostics/text.h"
-
 #include "scene/user/camera/camera.h"
 #include "scene/landscape/sky/sky.h"
 #include "scene/landscape/clouds/seaOfClouds.h"
 #include "scene/landscape/clouds/cloudLandscape.h"
 #include "scene/landscape/props/props.h"
+#include "scene/user/wyvern/wyvern.h"
 #include "renders/frustum/frustum.h"
-
+#include "renders/shader/shader.h"
+#include "renders/diagnostics/text.h"
 #include <cstdio>
 
 
@@ -27,6 +24,10 @@ namespace {
     float mouseY = viewportHeight / 2.0f;
 
     Camera camera(glm::vec3(0.0f, 24.0f, 75.0f));
+    Wyvern wyvern(glm::vec3(0.0f, 24.0f, 75.0f));
+
+    const float camHeight = 10.0f;
+    const float camDist = 20.0f;
 
     void keyCallback(GLFWwindow* window, int key, int, int cmnd, int) {
         if(cmnd != GLFW_PRESS) {
@@ -51,13 +52,13 @@ namespace {
             startingMousePos = false;
         }
 
-        float xRate = static_cast<float>(xPos) - mouseX;
+        float x = static_cast<float>(xPos) - mouseX;
         mouseX = static_cast<float>(xPos);
 
-        float yRate = static_cast<float>(yPos) - mouseY;
+        float y = static_cast<float>(yPos) - mouseY;
         mouseY = static_cast<float>(yPos);
 
-        camera.processMouse(xRate, yRate);
+        wyvern.processMouseInput(x, y);
     }
 }
 
@@ -175,6 +176,13 @@ int main(){
         }
     }
 
+    Shader wyvernShader("shaders/wyvern/wyvern.frag", "shaders/wyvern/wyvern.vert");
+    if(!wyvern.loadWyvern("assets/wyvern/wyvern.glb")){
+        std::fprintf(stderr, "Could not load wyvern model\n");
+        return 1;
+    }
+    const glm::vec3 wyvernColor(0.55f, 0.32f, 0.30f);
+
     int fpsTotalFrames = 0;
 
     float fpsTotalTime = 0.0f;
@@ -194,14 +202,20 @@ int main(){
             fpsTotalTime = 0.0f;
         }
 
-        bool up = glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS;
-        bool down = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS;
-        bool left = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
-        bool right = glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
         bool forward = glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS;
         bool backward = glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS;
+        bool left = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
+        bool right = glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
 
-        camera.processKeys(up, down, left, right, forward, backward, frameTime);
+        wyvern.processKeyInput(forward, backward, left, right, frameTime);
+        camera.thirdPerson(
+            camDist, 
+            camHeight,
+            frameTime,
+            wyvern.pos,
+            wyvern.forward,
+            wyvern.up
+        );
 
         glm::mat4 view = camera.viewMatrix();
         glm::mat4 projection = glm::perspective(
@@ -241,6 +255,9 @@ int main(){
         toriiIsland.drawProp(propShader);
         treeIsland.drawProp(propShader);
 
+        wyvernShader.use();
+        wyvernShader.uniSet("viewProjection", projection * view);
+        wyvern.drawWyvern(wyvernShader, wyvernColor);
 
         glDisable(GL_DEPTH_TEST);
         textShader.use();

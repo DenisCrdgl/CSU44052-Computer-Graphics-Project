@@ -3,6 +3,7 @@
 #include <string>
 #include <cstdint>
 #include <glm/glm.hpp>
+#include <vector>
 
 class Shader{
     public:
@@ -20,4 +21,5 @@ class Shader{
         void uniSet(const std::string& loc, const glm::vec2& val) const;
         void uniSet(const std::string& loc, const glm::vec3& val) const;
         void uniSet(const std::string& loc, const glm::mat4& val) const;
+        void uniSet(const std::string& loc, const std::vector<glm::mat4>& vals) const;
 };
