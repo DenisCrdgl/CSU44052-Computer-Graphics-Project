@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
 #include "scene/user/camera/camera.h"
 #include "scene/landscape/sky/sky.h"
 #include "scene/landscape/clouds/seaOfClouds.h"
@@ -10,8 +11,11 @@
 #include "scene/user/wyvern/wyvern.h"
 #include "renders/frustum/frustum.h"
 #include "renders/shader/shader.h"
+#include "renders/shadow/shadow.h"
 #include "renders/diagnostics/text.h"
+
 #include <cstdio>
+#include <cmath>
 
 
 namespace {
@@ -28,6 +32,10 @@ namespace {
 
     const float camHeight = 10.0f;
     const float camDist = 20.0f;
+
+    const float lightSourceDist = 40.0f;
+    const float shadowFarPlane = lightSourceDist + 80.0f;
+    const float orthoProjectionSize = 10.0f;
 
     void keyCallback(GLFWwindow* window, int key, int, int cmnd, int) {
         if(cmnd != GLFW_PRESS) {
@@ -183,6 +191,9 @@ int main(){
     }
     const glm::vec3 wyvernColor(0.55f, 0.32f, 0.30f);
 
+    Shadow shadow(1024);
+    Shader shadowShader("shaders/shadow/shadow.frag", "shaders/shadow/shadow.vert");
+
     int fpsTotalFrames = 0;
 
     float fpsTotalTime = 0.0f;
@@ -232,6 +243,30 @@ int main(){
             prop->update(camPos);
         }
 
+        glm::vec3 lightPos = wyvern.pos + sunDirection * lightSourceDist;
+        glm::vec3 lightUp;
+        if(std::abs(glm::dot(sunDirection, glm::vec3(0.0f, 1.0f, 0.0f))) > 0.99f){
+            lightUp = glm::vec3(0.0f, 0.0f, 1.0f);
+        }
+        else{
+            lightUp = glm::vec3(0.0f, 1.0f, 0.0f);
+        }
+        glm::mat4 lightView = glm::lookAt(lightPos, wyvern.pos, lightUp);
+        glm::mat4 lightProjection = glm::ortho(
+            -orthoProjectionSize, 
+            orthoProjectionSize,
+            -orthoProjectionSize,
+            orthoProjectionSize,
+            1.0f,
+            shadowFarPlane
+        );
+        
+        shadow.start();
+        shadowShader.use();
+        shadowShader.uniSet("lightViewProjection", lightProjection * lightView);
+        wyvern.drawShadow(shadowShader);
+        shadow.stop(viewportWidth, viewportHeight);
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         skyShader.use();
@@ -243,13 +278,23 @@ int main(){
         skyShader.uniSet("cameraPosition", camPos);
         sky.drawSky();
 
+        shadow.bind(0);
         cloudsShader.use();
         cloudsShader.uniSet("viewProjection", projection * view);
         cloudsShader.uniSet("color", cloudColor);
+        cloudsShader.uniSet("sunColor", sunColor);
+        cloudsShader.uniSet("sunDirection", sunDirection);
+        cloudsShader.uniSet("lightViewProjection", lightProjection * lightView);
+        cloudsShader.uniSet("shadowMapping", 0);
         cloudLandscape.drawLandscape(frustum);
 
+        shadow.bind(0);
         propShader.use();
         propShader.uniSet("viewProjection", projection * view);
+        propShader.uniSet("sunColor", sunColor);
+        propShader.uniSet("sunDirection", sunDirection);
+        propShader.uniSet("lightViewProjection", lightProjection * lightView);
+        propShader.uniSet("shadowMapping", 0);
         lighthouseIsland.drawProp(propShader);
         balloons.drawProp(propShader);
         toriiIsland.drawProp(propShader);
@@ -257,6 +302,8 @@ int main(){
 
         wyvernShader.use();
         wyvernShader.uniSet("viewProjection", projection * view);
+        wyvernShader.uniSet("sunColor", sunColor);
+        wyvernShader.uniSet("sunDirection", sunDirection);
         wyvern.drawWyvern(wyvernShader, wyvernColor);
 
         glDisable(GL_DEPTH_TEST);

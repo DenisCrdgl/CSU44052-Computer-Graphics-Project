@@ -12,6 +12,7 @@ uniform mat4 viewProjection;
 
 out vec3 normal;
 out vec3 color;
+out vec3 worldPos;
 
 void main(){
     mat4 skin =
@@ -25,4 +26,5 @@ void main(){
 
     color = inputColor;
     normal = mat3(model) * mat3(skin) * inputNormal;
+    worldPos = (model * skinPosition).xyz;
 }

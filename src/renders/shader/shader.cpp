@@ -104,3 +104,7 @@ void Shader::uniSet(const std::string& loc, const std::vector<glm::mat4>& vals) 
         glm::value_ptr(vals[0])
     );
 }
+
+void Shader::uniSet(const std::string& loc, int val) const{
+    glUniform1i(uniLocation(loc), val);
+}

@@ -80,3 +80,10 @@ void Wyvern::drawWyvern(const Shader& shader, const glm::vec3& color) const{
     shader.uniSet("base", color);
     model.drawWyvern();
 }
+
+void Wyvern::drawShadow(const Shader& shader) const{
+    std::vector<glm::mat4> joints = model.jointMatrices(animationTime, flightAnimation);
+     shader.uniSet("model", modelMtrx());
+    shader.uniSet("jointsList", joints);
+    model.drawWyvern();
+}

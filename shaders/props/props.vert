@@ -6,6 +6,7 @@ layout(location = 2) in vec3 inputColor;
 
 out vec3 normal;
 out vec3 color;
+out vec3 worldPos;
 
 uniform mat4 model;
 uniform mat4 viewProjection;
@@ -14,4 +15,5 @@ void main(){
     gl_Position =  viewProjection * model * vec4(position, 1.0);
     normal = mat3(model) * inputNormal;
     color = inputColor;
+    worldPos = (model * vec4(position, 1.0)).xyz;
 }

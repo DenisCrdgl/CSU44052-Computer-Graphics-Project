@@ -22,4 +22,5 @@ class Shader{
         void uniSet(const std::string& loc, const glm::vec3& val) const;
         void uniSet(const std::string& loc, const glm::mat4& val) const;
         void uniSet(const std::string& loc, const std::vector<glm::mat4>& vals) const;
+        void uniSet(const std::string& loc, int val) const;
 };

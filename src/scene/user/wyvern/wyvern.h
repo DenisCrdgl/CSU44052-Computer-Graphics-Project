@@ -31,4 +31,5 @@ class Wyvern{
         void processKeyInput(bool wKey, bool sKey, bool aKey, bool dKey, float frameTime);
         bool loadWyvern(const std::string& path);
         void drawWyvern(const Shader& shader, const glm::vec3& color) const;
+        void drawShadow(const Shader& shader) const;
 };
