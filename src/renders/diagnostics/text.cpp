@@ -44,6 +44,15 @@ namespace{
     }
 }
 
+/*
+    Summary: This class handles the HUD text.
+    The text positioning is calculated by txtWidth() function that
+    computes the screen width of the text. The drawTxt() function then 
+    case corrects the text, extracts the corresponding glyph for each 
+    character and then renders it on the HUD with a given color
+
+    Note: Glyph table and txtWidth() is AI generated
+*/
 RenderText::RenderText(){
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);

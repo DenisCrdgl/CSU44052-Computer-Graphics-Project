@@ -23,6 +23,18 @@ namespace{
     }
 }
 
+
+/*
+    Summary: Class that renders GLTF props using
+    chunk based rendering. Spawn positions within
+    its own chunk is decided via Perlin noise sampling
+    and rng in the function sample(). These models are then
+    updated accordingly in update() depending on the chunk and
+    if it is within the render radius. The functions load() and
+    drawProp() then load the model and place in the landscape
+
+    Note: sample() structure is AI generated
+*/
 Prop::Prop(const PropParams& propParams, std::string path)
     : path(std::move(path)), params(propParams){
 }

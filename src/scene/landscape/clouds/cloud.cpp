@@ -63,6 +63,14 @@ namespace{
     }
 }
 
+/*
+    Summary: This class handles the per cloud rendering.
+    It uses a separate buildSphere() function to make spheres 
+    Those spheres are then randomly clumped together based on 
+    constructor rng and altered by Perlin noise to make them look fluffy. 
+    The function addMesh() then takes the noise distributed fluff cluster and 
+    writes it into a result mesh for chunk rendering
+*/
 Cloud::Cloud(const CloudParams& cloudParams): 
     params(cloudParams), perlin(cloudParams.seed){
     

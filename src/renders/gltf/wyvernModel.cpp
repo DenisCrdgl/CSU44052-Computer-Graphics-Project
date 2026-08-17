@@ -209,6 +209,19 @@ namespace{
     }
 }
 
+/*
+    Summary: This class is responsible for rendering the wyvern.glb
+    and all associated animates with it. The big loadWyvern() function
+    goes through each individual node and records the orientation and
+    children of the node, finds root node, finds node with skin and mesh,
+    processes through joints and processes animations, including their frames
+    and length. All of this is then used in jointMatrices() where animations are
+    sampled per node, compute skinning matrices and return them as vectors defining
+    their space location during the animation. The drawWyvern() then binds all primitives
+    to VAO and renders the wyvern on the scene
+    
+    Note: Children related code is AI generated
+*/
 WyvernModel::~WyvernModel(){
     for(const Primitive& primitive : primitives){
         if(primitive.vao){

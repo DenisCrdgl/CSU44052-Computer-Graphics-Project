@@ -3,6 +3,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <cmath>
 
+/*
+    Summary: This class is a simple camera set up.
+    It builds a view matrix via viewMatrix() according to
+    camera position/orientation. The function thirdPerson()
+    is the main class function that updates the camera in respect
+    to the model's state
+*/
 Camera::Camera(const glm::vec3& position) : pos(position){
 
 }

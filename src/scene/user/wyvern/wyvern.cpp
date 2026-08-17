@@ -4,6 +4,19 @@
 #include <algorithm>
 #include <cmath>
 
+/*
+    Summary: This object is responsible for the
+    wyvern the player moves around. Uses processMouseInput()
+    and processKeyInput() to register the movement the user
+    wants with mouse movement representing looking direction
+    and key pressing representing forward, backward, left and
+    right. The orientation of the wyvern is updated
+    by updateVec(). The model itself is built using modelMtrx()
+    which takes its relevant positions and orientation and is then
+    drawn using drawWyvern(). The function drawShadow() is used to
+    pass the model through the depth shadow function in order for it 
+    to cast shadows over any cloud/prop underneath
+*/
 Wyvern::Wyvern(const glm::vec3& position) : pos(position){
 }
 

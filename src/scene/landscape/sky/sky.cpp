@@ -13,6 +13,13 @@ namespace {
     };
 }
 
+/*
+    Summary: Draws the gradient sky and sun using
+    drawSky() function. Most of the functionality
+    is based in the vert/frag files for the sky which
+    define the gradient based on the view, making the sky
+    slightly shift color the farther up you look 
+*/
 Sky::Sky() {
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);

@@ -26,6 +26,10 @@ namespace {
 
     bool startingMousePos = true;
     bool wireframeDisplay = false;
+    bool fullscreenEnabled = true;
+
+    const int windowedWidth = Config::windowWidth;
+    const int windowedHeight = Config::windowHeight;
 
     float mouseX = viewportWidth / 2.0f;
     float mouseY = viewportHeight / 2.0f;
@@ -52,6 +56,21 @@ namespace {
         if(key == GLFW_KEY_TAB){
             wireframeDisplay = !wireframeDisplay;
         }
+
+        if(key == GLFW_KEY_F11){
+            fullscreenEnabled = !fullscreenEnabled;
+            GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+            const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+            if(fullscreenEnabled){
+                glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+            }
+            else{
+                int xpos = (mode->width - windowedWidth) / 2;
+                int ypos = (mode->height - windowedHeight) / 2;
+                glfwSetWindowMonitor(window, nullptr, xpos, ypos, windowedWidth, windowedHeight, GLFW_DONT_CARE);
+            }
+        }
     }
 
     void framebufferSizeCallback(GLFWwindow*, int width, int height){
@@ -77,6 +96,13 @@ namespace {
     }
 }
 
+/*
+    Main strings together all the classes and helper functions calling
+    respective functions defined in the context or generated instance.
+    To check functionality, a comment can be found above constructors,
+    destructors or below the namespace, briefly summarizing the 
+    role they play in the code base
+*/
 int main(){
     std::setvbuf(stdout, nullptr, _IONBF, 0);
 
@@ -93,7 +119,13 @@ int main(){
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
     #endif
 
-    GLFWwindow* window = glfwCreateWindow(viewportWidth, viewportHeight, "Project", nullptr, nullptr);
+    GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode* videoMode = glfwGetVideoMode(primaryMonitor);
+    viewportWidth = videoMode->width;
+    viewportHeight = videoMode->height;
+    glfwWindowHint(GLFW_REFRESH_RATE, videoMode->refreshRate);
+
+    GLFWwindow* window = glfwCreateWindow(viewportWidth, viewportHeight, "Project", primaryMonitor, nullptr);
 
     if(!window){
         std::fprintf(stderr, "Window creation error.\n");
@@ -131,6 +163,8 @@ int main(){
     const glm::vec3 cloudColor(0.9f, 0.9f, 0.95f);
     Shader cloudsShader("shaders/clouds/clouds.frag", "shaders/clouds/clouds.vert");
     CloudLandscape cloudLandscape(cloudParams);
+    cloudLandscape.renderRadius = Config::cloudRenderRadius;
+    cloudLandscape.derenderRadius = Config::cloudDerenderRadius;
 
     Shader propShader("shaders/props/props.frag", "shaders/props/props.vert");
 
@@ -139,7 +173,7 @@ int main(){
             55.0f, 90.0f,
             0.9f, 1.4f,
             1, 1,
-            0.0f, 3,
+            0.0f, Config::lighthouseLoadRadius,
             Config::lighthouseChunkSize,
             Config::lighthouseSpawnRate,
             7777
@@ -152,7 +186,7 @@ int main(){
             22.0f, 46.0f, 
             3.0f, 4.5f,
             2, 4,
-            18.0f, 5,
+            18.0f, Config::balloonLoadRadius,
             Config::balloonChunkSize,
             Config::balloonSpawnRate,
             6666
@@ -165,7 +199,7 @@ int main(){
             18.0f, 44.0f,
             0.5f, 0.85f,
             1, 1,
-            0.0f, 3,
+            0.0f, Config::toriiLoadRadius,
             Config::toriiChunkSize,
             Config::toriiSpawnRate,
             5555
@@ -178,7 +212,7 @@ int main(){
             15.0f, 40.0f,
             5.0f, 8.0f,
             1, 1,
-            0.0f, 5,
+            0.0f, Config::treeLoadRadius,
             Config::treeChunkSize,
             Config::treeSpawnRate,
             4444
@@ -199,6 +233,7 @@ int main(){
         return 1;
     }
     const glm::vec3 wyvernColor(0.55f, 0.32f, 0.30f);
+    wyvern.speed = Config::wyvernSpeed;
 
     Shadow shadow(Config::shadowResolution);
     Shader shadowShader("shaders/shadow/shadow.frag", "shaders/shadow/shadow.vert");

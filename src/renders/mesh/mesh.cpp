@@ -2,6 +2,13 @@
 
 #include<glad/gl.h>
 
+/*
+    Summary: This class handles meshes.
+    The init() function uploads a mesh from MeshData and generates
+    the proper VAO, VBO and EBO, which are instead updated if they exist
+    and init() is called again. The drawMesh() function then binds VAO and
+    draws the triangle polygons
+*/
 Mesh::~Mesh(){
     if(vao){
         glDeleteVertexArrays(1, &vao);

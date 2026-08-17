@@ -43,6 +43,12 @@ namespace {
     }
 }
 
+/*
+    Summary: This class handles the vert/frag shader processing.
+    The class compiles the input shaders given in the constructor,
+    then binds the compiled shader via use(). There are also useful helper
+    functions uniSet() that allow uniform set of any specified data type
+*/
 Shader::Shader(const std::string& fragPath, const std::string& vertPath){
     uint32_t fragFile = compileShader(GL_FRAGMENT_SHADER, readShader(fragPath), fragPath);
     uint32_t vertFile = compileShader(GL_VERTEX_SHADER, readShader(vertPath), vertPath);

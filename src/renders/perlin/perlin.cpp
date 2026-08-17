@@ -5,6 +5,19 @@
 #include <algorithm>
 #include <numeric>
 
+/*
+    Summary: This class handles Perlin noise.
+    A Perlin octave is generated via generate() function that is
+    cross checked to determine the unit cube it falls in and proceeds
+    to check permutationTable to check cube corners (which are hashed),
+    finally resulting in its interpolation via the blend() function.
+    The gradient() function uses a gradient technique from bits of the hashed value
+    in order to avoid storing the values (can just compute them on the spot).
+    The smooth() function is used to make the noise less rigid and blocky. This
+    generation process is repeated for each octave specified in assemble()
+
+    Note: Permutation table population is AI generated
+*/
 Perlin::Perlin(uint32_t seed){
     uint8_t base[256];
     std::iota(std::begin(base), std::end(base), 0);

@@ -61,6 +61,14 @@ namespace{
     }
 }
 
+/*
+    Summary: This class handles all of the prop GLTF model rendering.
+    The load function reads the GLTF model file, traverses all of the nodes,
+    and computes the necessary transforms and normals of those nodes, as well
+    as applying coloring to materials (no textures) and then bakes normals and
+    positions into a global transform matrix. The drawModel() function then binds VAO
+    and renders the prop object on the scene 
+*/
 Gltf::~Gltf(){
     for(const Primitive& primitive : primitives){
         if(primitive.vao){

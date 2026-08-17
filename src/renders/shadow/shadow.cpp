@@ -2,6 +2,16 @@
 
 #include <glad/gl.h>
 
+/*
+    Summary: This class handles the shadow depth processing.
+    It has a start() function which binds shadow resolution to FBO
+    and resizes viewport in addition to cleaning the depth pass buffer 
+    in anticipation of the rendering of the model of interest. 
+    The complement function stop() unbinds FBO and resizes viewport to
+    value specified inputs given to the function. The depth texture is then bound
+    via shaders using bind() function which contain the necessary shadowSampling
+    functions in their frag files  
+*/
 Shadow::Shadow(int resolution) : res(resolution){
     glGenTextures(1, &depth);
     glBindTexture(GL_TEXTURE_2D, depth);

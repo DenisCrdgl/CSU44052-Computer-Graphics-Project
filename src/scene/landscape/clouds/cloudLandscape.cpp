@@ -5,6 +5,21 @@
 #include <limits>
 #include <algorithm>
 
+/*
+    Summary: This class handles the chunks of rendered clouds.
+    The landscape generates all of the processed chunks via the function
+    genChunkMesh() based on the cloud parameters and builds a cloud for
+    every chunk of interest, which then gets merged into MeshData. This uses
+    threads for concurrency to process multiple chunks via workerLoop() using
+    queues to process closest pending chunks. Chunks are updated based on the 
+    position that positionCoords() return, which then updateLandscape() uses
+    to choose and derender any chunks outside the agreed derender radius and is
+    the main location where pending chunks are queued for workerLoop(). After
+    all this, drawLandscape() draws loaded chunks on the scene with
+    Frustum culling applied for better performance
+
+    Note: Thread and worker related code is AI generated
+*/
 CloudLandscape::CloudLandscape(const CloudSeaParams& params)
     : landscapeSize(params.chunkSize * 3.0f), params(params){
 

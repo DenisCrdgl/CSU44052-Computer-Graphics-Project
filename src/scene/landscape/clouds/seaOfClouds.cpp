@@ -18,6 +18,15 @@ namespace {
     }
 }
 
+/*
+    Summary: This file controls the cloud chunk rendering.
+    The cloudChunk() function decides the spawn points of clouds per chunk,
+    using Perlin noise sampling for height (gated by a threshold) and rng for
+    x/z location coordinates. The assembleCloudParams() function assembles the
+    necessary parameters to generate the clouds on these spawn points,
+    additionally using rng to decide frequency, spread and amplitude for
+    per cloud uniqueness
+*/
 bool cloudChunk(glm::vec3& position, const CloudSeaParams& params, int x, int z){
     Perlin layout(params.seed);
 

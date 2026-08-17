@@ -1,5 +1,14 @@
 #include "renders/frustum/frustum.h"
 
+/*
+    Summary: This class implements Frustum culling.
+    The constructor extracts all 6 view planes using the
+    Gribb/Hartmann plane extraction technique and then uses those
+    planes in the isIntersection() function which decides the culling
+    based on a set of points and their relative location to these planes
+
+    Note: planes[] population code is AI generated
+*/
 Frustum::Frustum(const glm::mat4& mtrx){
     planes[0] = 
         glm::vec4(
