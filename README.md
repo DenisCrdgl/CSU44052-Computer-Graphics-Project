@@ -31,6 +31,6 @@ cmake --build .
 cd ..
 ````
 
-Run executable in build/bin
+Run executable in build/bin from root
 
 
